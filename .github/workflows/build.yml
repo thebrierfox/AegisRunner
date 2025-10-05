@@ -3,10 +3,11 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
-      - '**.json'
+      - 'app/**'
+      - 'build.gradle'
+      - 'settings.gradle'
       - '.github/workflows/build.yml'
 
 jobs:
@@ -23,12 +24,13 @@ jobs:
           cache: gradle
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug || echo "No project to build yet"
-        working-directory: .
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleDebug
 
-      - name: Upload artifacts (if any)
+      - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
+          name: app-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
