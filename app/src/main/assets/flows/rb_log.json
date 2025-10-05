@@ -1,0 +1,22 @@
+{
+  "name": "RB Log — Parking CoPresence",
+  "steps": [
+    {"get_location": {"timeout_ms": 2500}},
+    {
+      "http_get": {
+        "url": "https://script.google.com/macros/s/DEPLOY_ID/exec",
+        "params": {
+          "context": "under_specified",
+          "location": "parking_lot",
+          "scene": "vehicle",
+          "cp": "1",
+          "grid": "1",
+          "adj": "0",
+          "observer": "~K1",
+          "city": "Poplar Bluff, MO"
+        }
+      }
+    },
+    {"toast": "RB logged"}
+  ]
+}
