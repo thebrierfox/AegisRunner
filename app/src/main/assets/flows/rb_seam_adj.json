@@ -1,0 +1,21 @@
+{
+  "name": "RB Log — Interior Seam",
+  "steps": [
+    {"get_location": {"timeout_ms": 2500}},
+    {
+      "http_get": {
+        "url": "https://script.google.com/macros/s/DEPLOY_ID/exec",
+        "params": {
+          "context": "under_specified",
+          "location": "store",
+          "scene": "interior",
+          "cp": "1",
+          "grid": "1",
+          "adj": "1",
+          "note": "rb_headband"
+        }
+      }
+    },
+    {"toast": "RB logged"}
+  ]
+}
