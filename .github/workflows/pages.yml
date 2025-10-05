@@ -1,0 +1,31 @@
+name: Deploy PWA to Pages
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'pwa/**', '.github/workflows/pages.yml' ]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject WEBAPP_URL
+        if: ${{ secrets.WEBAPP_URL != '' }}
+        run: sed -i "s~https://script.google.com/macros/s/DEPLOY_ID/exec~${{ secrets.WEBAPP_URL }}~" pwa/index.html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'pwa'
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
