@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RB Logger</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    h1 { text-align: center; }
+    .card { background: white; margin: 10px auto; padding: 20px; border-radius: 8px; width: 300px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    button { display:block; margin-top: 10px; padding:10px 20px; border: none; border-radius:4px; background: #007bff; color:white; cursor: pointer; }
+    button:disabled { background: #ccc; }
+  </style>
+</head>
+<body>
+  <h1>RB Logger</h1>
+  <div class="card">
+    <h2>Parking CoPresence</h2>
+    <button onclick="logEvent('under_specified','parking_lot','vehicle','1','1','0')">Log</button>
+  </div>
+  <div class="card">
+    <h2>Interior Seam</h2>
+    <button onclick="logEvent('under_specified','store','interior','1','1','1','rb_headband')">Log</button>
+  </div>
+  <div class="card">
+    <h2>Rules-Limited</h2>
+    <button onclick="logEvent('rules_limited','home_exterior','exterior','1','1','1')">Log</button>
+  </div>
+<script>
+// URL for your Apps Script web app; will be replaced in CI via secrets
+const WEBAPP_URL = "https://script.google.com/macros/s/DEPLOY_ID/exec";
+
+async function logEvent(context, location, scene, cp, grid, adj, note='') {
+  // Try to get location; fallback to send without lat/lng
+  if (!('geolocation' in navigator)) {
+    sendEvent(null, null);
+  } else {
+    navigator.geolocation.getCurrentPosition(
+      pos => sendEvent(pos.coords.latitude, pos.coords.longitude),
+      err => sendEvent(null, null),
+      {timeout: 3000}
+    );
+  }
+
+  function sendEvent(lat, lng) {
+    const params = new URLSearchParams({
+      context, location, scene, cp, grid, adj,
+      observer:'~K1', city:'Poplar Bluff, MO'
+    });
+    if (note) params.append('note', note);
+    if (lat != null && lng != null) {
+      params.append('lat', lat);
+      params.append('lng', lng);
+    }
+    // Fire and forget request; no-cors to avoid CORS preflight
+    fetch(WEBAPP_URL + '?' + params.toString(), {mode:'no-cors'})
+      .then(() => alert('Logged'))
+      .catch(() => alert('Failed to send; may retry later'));
+  }
+}
+
+// Register service worker for offline functionality
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
+</script>
+</body>
+</html>
