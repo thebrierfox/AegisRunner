@@ -1,0 +1,17 @@
+agent:
+    name: aegisrunner-agent
+    description: Android flows and debug build runner
+    entrypoint: tasks/hello_world.py
+  env:
+    required:
+  - ANDROID_SDK_ROOT
+    optional:
+  - LOG_LEVEL: INFO
+  secrets:
+    mount: .env
+  tasks:
+build_debug: tasks/build_debug.py
+list_flows: tasks/list_flows.py
+  hooks:
+    pre: hooks/pre_task.py
+    post: hooks/post_task.py
